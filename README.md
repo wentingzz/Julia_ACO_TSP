@@ -1,5 +1,5 @@
 # Julia ACO TSP
-This project is to implement ACO(Ant Colony Optimization) to approach TSP(Traveling Salesman Problem) in Julia. **Note** that the uploaded files is intended to run in Jupyter Notebook.
+This project is to implement ACO(Ant Colony Optimization) and assess its performance for solving TSP(Traveling Salesman Problem) in Julia. **Note** that the uploaded files is intended to run in Jupyter Notebook.
 
 ## Installation
 We first need to install Julia and Jupyter notebook with this link (https://datatofish.com/add-julia-to-jupyter/)
@@ -19,10 +19,21 @@ n! =12....(n-1)n
 Wheat and Chessboard Problem is a famous mathematical problem. In the story, the king promised to give the man any reward he wants if he wins the chess game. The man simply asked the put one grain on the first square of the chessboard, two on the second, and four on the third. The amount is doubled every time and he wants to have the sum of the grains of wheat. The sum is 264-1grains of wheat. The weight is about 1,199,000,000,000 metric tons. which is about 1,645 times the global production of wheat in 2014. This demonstrates the rapid growth of the exponential function 2n. The factorial function n!, on the other hand, even grows faster than exponential function 2n, so it’s nearly impossible to compute all the solutions and compare them to find the best one as the number of the cities increases. 
 There is a way to reduce the time complexity to n22n, which is much less than factorial function n!, but the time needed is still exponential and expensive. Due to the cost to compute all the solutions, it’s effective to find a relatively good solution with some algorithms.
 
-## ACO
+## Ant Colony Algorithms
+### Ant Colony Optimization (ACO)
 **Ant Colony Optimization** obviously mimics ants’ behavior of finding the shorter route from the nest and food source with pheromone-based communication. The leftmost image of Figure 3 is the simplest situation where there is no obstacle in the way from nest to food. The ants just move towards one direction. The second image is when the pheromone starts to work. If a stone is put on the way, the ants don’t know which way is shorter. They will each randomly chose a path and deposit some pheromone along the way. The pheromone is a chemical substance that evaporates as time passes, so the ants will get some information about the tour based the remnant pheromone. Interestingly, ants are more likely to choose the path with more pheromone, which indicates a shorter length, but it’s not a guaranteed choice. This randomness ensures the high probability of choosing the current best tour as well as the opportunity of exploring the new tours.
 
+### Max-Min Ant System (MMAS)
 **Max-Min Ant System** and ACO are both in Ant Colony Algorithm Family and have very similar behaviors. One unique feature of the MMAS is the extra control over the pheromone. The pheromone on the edge will always be in a range, which avoids the situation where the best solution dominates. 
 
+## Implementation
+### Choices
+I didn't choose struct to implement the basic structures, such as city, ant, pheromone, for two reasons. (1) Struct has more constraints and strict rules to follow. (2) Julia is a Python-like language. Ut should run faster with the basic data structure, array. If Julia is an object-oriented language, like Java, it makes more sense to use object/struct.
+We tried to implement the pheromone map as dictionary so that we don't need to keep track of all the edges, especially for MMAS. When the pheromone level hits the lower bound, we delete it from the dictionary. This implementation should save the space, but it also hurts the speed. Using dictionary is three times slower than the array, which requires much longer to run a big TSP. Therefore, we changed the dictionary back to array. 
 
+
+### Planning
+There are several ways we can improve our program
+(1) One observation along the implementation is the similarity between distance matrix and pheromone map. They are both symmetric matrix because the distance from i to j equals to the distance from j to i. Same with the pheromone map. That is to say, they both wasting half of the space storing repeated data. By merging the two arrays, we are able to save space without hurting the speed.
+(2) The program first run the greedy algorithm to quickly get several solutions (tours). Then pheromone is deposited along these 10 tours based on the length. In this case, instead of starting without knowing anythiinng, the ants will have some information about the TSP. 
 [image]
